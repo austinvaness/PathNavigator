@@ -50,12 +50,7 @@ namespace IngameScript
                 if (currentPaths.Count > 0)
                 {
                     foreach (PathKey key in currentPaths)
-                    {
-                        if (key.reversed)
-                            Echo(key.end + "->" + key.start + '*');
-                        else
-                            Echo(key.start + "->" + key.end);
-                    }
+                        Echo(key.start + "->" + key.end);
                     Move(paths [currentPaths.Peek()]);
                     CheckPaths();
                 }
@@ -164,30 +159,14 @@ namespace IngameScript
                 return;
 
             PathKey key = currentPaths.Peek();
-            if (key.reversed)
-                paths [key].UpdateStatus(Path.Mode.Reverse);
-            else
-                paths [key].UpdateStatus(Path.Mode.Forward);
+            paths [key].UpdateStatus(Path.Mode.Play);
         }
 
         bool ContainsKey (ref PathKey p)
         {
             if (p.start == p.end)
                 return false;
-
-            if (paths.ContainsKey(p))
-            {
-                return true;
-            }
-            else if (paths.ContainsKey(new PathKey(p.end, p.start)))
-            {
-                string temp = p.end;
-                p.end = p.start;
-                p.start = temp;
-                p.reversed = true;
-                return true;
-            }
-            return false;
+            return paths.ContainsKey(p);
         }
 
         void Command (string command)

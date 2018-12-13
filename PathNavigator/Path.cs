@@ -7,7 +7,6 @@ namespace IngameScript
 {
     partial class Program
     {
-
         class Path
         {
             Dictionary<int, Point> values = new Dictionary<int, Point>();
@@ -21,7 +20,7 @@ namespace IngameScript
             }
             public enum Mode
             {
-                None, Recording, Forward, Reverse
+                None, Recording, Play
             }
             public Mode Status
             {
@@ -41,10 +40,8 @@ namespace IngameScript
             {
                 get
                 {
-                    if (Status == Mode.Forward)
+                    if (Status == Mode.Play)
                         return values [movementTick].velocity.Value;
-                    else if (Status == Mode.Reverse)
-                        return -values [movementTick].velocity.Value;
                     throw new Exception("Cannot access velocity while not in play mode.");
                 }
             }
@@ -52,10 +49,8 @@ namespace IngameScript
             {
                 get
                 {
-                    if (Status == Mode.Forward)
+                    if (Status == Mode.Play)
                         return values [rotationTick].forward.Value;
-                    else if (Status == Mode.Reverse)
-                        return -values [rotationTick].forward.Value;
                     throw new Exception("Cannot access forward direction while not in play mode.");
                 }
             }
@@ -63,7 +58,7 @@ namespace IngameScript
             {
                 get
                 {
-                    if (Status == Mode.Forward || Status == Mode.Reverse)
+                    if (Status == Mode.Play)
                         return values [rotationTick].up.Value;
                     throw new Exception("Cannot access upward direction while not in play mode.");
                 }
@@ -104,7 +99,7 @@ namespace IngameScript
                         values.Add(tick, p);
                     }
                 }
-                else if (Status == Mode.Forward)
+                else if (Status == Mode.Play)
                 {
                     if (tick < lastTick && values.ContainsKey(tick))
                     {
@@ -115,22 +110,6 @@ namespace IngameScript
                             rotationTick = tick;
                     }
                     else if (tick == lastTick)
-                    {
-                        Status = Mode.None;
-                    }
-                }
-                else if (Status == Mode.Reverse)
-                {
-                    tick = lastTick - tick;
-                    if (tick >= 0 && values.ContainsKey(tick))
-                    {
-                        Point p = values [tick];
-                        if (p.position.HasValue)
-                            movementTick = tick;
-                        if (p.forward.HasValue)
-                            rotationTick = tick;
-                    }
-                    else if (tick < 0)
                     {
                         Status = Mode.None;
                     }
@@ -156,16 +135,8 @@ namespace IngameScript
                     values.Add(lastTick, new Point(rc, true, true));
                 }
 
-                if (newStatus == Mode.Reverse)
-                {
-                    movementTick = lastTick;
-                    rotationTick = lastTick;
-                }
-                else
-                {
-                    movementTick = 0;
-                    rotationTick = 0;
-                }
+                movementTick = 0;
+                rotationTick = 0;
                 timer.Start();
                 Status = newStatus;
             }
@@ -180,12 +151,10 @@ namespace IngameScript
         {
             public string start;
             public string end;
-            public bool reversed;
-            public PathKey (string start, string end, bool reversed = false)
+            public PathKey (string start, string end)
             {
                 this.start = start;
                 this.end = end;
-                this.reversed = reversed;
             }
 
             public override bool Equals (object obj)

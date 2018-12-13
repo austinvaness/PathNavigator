@@ -106,7 +106,6 @@
     <Compile Include="Path.cs" />
     <Compile Include="PID.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Readme.cs" />
     <AdditionalFiles Include="thumb.png" />
     <AdditionalFiles Include="MDK\whitelist.cache" />
     <Compile Include="ThrustControl.cs" />
